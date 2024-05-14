@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="cs">
+    <head>
+        <title>JavaScript Renderer</title>
+        <meta charset="utf-8" />
+        <style>
+			#canvas {
+				border: 1px dotted black;
+				float: left;
+			}
+
+			#control {
+				float: left;
+				width: 150px;
+				margin-left: 50px;
+			}
+
+        </style>
+        <script src="scripts/math.js"></script>
+        <script src="scripts/object3d.js"></script>
+        <script src="scripts/camera.js"></script>
+        <script src="scripts/vector.js"></script>
+        <script src="scripts/point3D.js"></script>
+        <script src="utilities.js"></script>
+        <script src="scripts/models.js"></script>
+        <script src="scripts/scene.js"></script>
+        <script src="stats.min.js"></script>
+        <script>
+            var canvas, ctx;
+            var angleX, angleY, mousePos;
+            var x = -30, y = -70;
+            var stats;
+
+            window.onload = function() {
+
+                canvas = document.getElementById('canvas');
+                ctx = canvas.getContext('2d');               
+                
+                camera = new camera(ctx);
+                scene = new scene(camera);
+                
+                box = new cuboid_H(370, 0, 200);
+                box.loadTexture("texture/box.jpg");
+                
+                box2 = new cuboid_H(-370, 0, 200);
+                box2.loadTexture("texture/box.jpg");
+                
+                sphere = new sphere_H(0, 0, 200);
+                sphere.loadTexture("texture/earth.jpg");
+                
+                scene.objects.push(box);
+                scene.objects.push(box2);
+                scene.objects.push(sphere);
+                
+                stats = new Stats();
+                stats.domElement.style.position = 'absolute';
+                stats.domElement.style.left = '0px';
+                stats.domElement.style.top = '0px';
+                stats.setMode(0);                
+                document.body.appendChild(stats.domElement);
+
+                canvas.addEventListener('mousemove', function(evt) {
+                    getMousePos(canvas, evt);
+                }, false);
+                
+                animate();
+
+            };
+            
+            function animate(){                
+                render();
+                stats.update();
+                requestAnimation(animate);
+            }
+            
+            function render() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                angleX = degreeToRadian((y - canvas.height / 2));
+                angleY = degreeToRadian(-(x - canvas.width / 2));
+                
+                scene.setRotX(angleX);
+                scene.setRotY(angleY);
+
+                scene.render();                
+            }
+            
+            window.addEventListener('keydown', keyPress, false);
+        </script>
+    </head>
+
+    <body>
+        <canvas id="canvas" width="800" height="600">
+            Váč prohlížeč nepodporuje element canvas.
+        </canvas>
+        <div id="control">
+            <b>Ovládání kamery:</b>
+           <table>
+               <tr><td> A </td><td>vlevo</td></tr> 
+               <tr><td> S </td><td>dolů</td></tr>
+               <tr><td> D </td><td>vpravo</td></tr>  
+               <tr><td> W </td><td>nahoru</td></tr> 
+               <tr><td> + </td><td>přiblížení</td></tr> 
+               <tr><td> - </td><td>oddálení</td></tr> 
+           </table>
+           
+        </div>
+    </body>
+</html>
